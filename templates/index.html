@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pay with M-Pesa</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { text-align: center; color: #333; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        #status { text-align: center; margin-top: 15px; color: #555; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>M-Pesa Checkout</h2>
+    <input type="text" id="phone" placeholder="Phone (e.g., 254712345678)" value="254710352607">
+    <input type="number" id="amount" placeholder="Amount (KES)" value="1">
+    <button onclick="payNow()">Pay Now</button>
+    <div id="status"></div>
+</div>
+
+<script>
+    function payNow() {
+        const phone = document.getElementById('phone').value;
+        const amount = document.getElementById('amount').value;
+        const statusDiv = document.getElementById('status');
+        
+        statusDiv.innerText = "Sending request to Safaricom...";
+        
+        // This calls your Python API
+        fetch(`/pay?phone=${phone}&amount=${amount}`)
+            .then(response => response.json())
+            .then(data => {
+                if(data.checkout_id) {
+                    statusDiv.innerText = "Prompt sent! Check your phone and enter your PIN.";
+                    statusDiv.style.color = "green";
+                } else {
+                    statusDiv.innerText = "Error: " + data.error;
+                    statusDiv.style.color = "red";
+                }
+            })
+            .catch(error => {
+                statusDiv.innerText = "Network error. Check the terminal.";
+            });
+    }
+</script>
+
+</body>
+</html>
